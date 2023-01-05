@@ -29,6 +29,12 @@
         {% block content %}
         {% endblock %}
     </div>
-    
+
+    <!-- HTMX script for add csrf_token to delete film but we use hx-headers='{"X-CSRFToken": "{{ csrf_token}}"}' in film-list.html -->
+    {% comment %} <script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}'; 
+    })
+    </script> {% endcomment %}
 </body>
 </html>

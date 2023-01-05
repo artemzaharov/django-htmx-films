@@ -46,12 +46,15 @@ class FilmList(LoginRequiredMixin, ListView):
     
 def add_film(request):
     name = request.POST.get('filmname')
-    film = Film.objects.create(name=name)
-    # add the film to the user list
+    film = Film.objects.get_or_create(name=name)[0]    # add the film to the user list
     request.user.films.add(film)
     # return template with all films
     films = request.user.films.all()
     return render(request, 'partials/film-list.html', {'films': films})
 
 
-
+def delete_film(request, pk):
+    request.user.films.remove(pk)
+    # return template with all films
+    films = request.user.films.all()
+    return render(request, 'partials/film-list.html', {'films': films})
