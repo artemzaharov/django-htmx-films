@@ -27,7 +27,7 @@
 
     <div class="container mt-4">
         {% block content %}
-        {% endblock %}
+        {% endblock content %}
     </div>
 
     <!-- HTMX script for add csrf_token to delete film but we use hx-headers='{"X-CSRFToken": "{{ csrf_token}}"}' in film-list.html -->
@@ -36,5 +36,6 @@
         event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}'; 
     })
     </script> {% endcomment %}
+    
 </body>
 </html>
