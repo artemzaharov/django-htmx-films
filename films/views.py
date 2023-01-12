@@ -4,7 +4,7 @@ from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views.generic import FormView, TemplateView
 from django.contrib.auth import get_user_model
-from films.models import Film
+from films.models import Film, UserFilms
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from films.forms import RegisterForm
@@ -12,6 +12,7 @@ from films.forms import RegisterForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
+from films.utils import get_max_order
 
 
 
@@ -45,8 +46,7 @@ class FilmList(LoginRequiredMixin, ListView):
     context_object_name = 'films'
     
     def get_queryset(self):
-        user = self.request.user
-        return user.films.all()
+        return UserFilms.objects.filter(user=self.request.user)
 
 @login_required 
 def add_film(request):
@@ -57,9 +57,15 @@ def add_film(request):
     else:
         # get_or_create returns a tuple (object, created)
         film = Film.objects.get_or_create(name=name)[0]    # add the film to the user list
-        request.user.films.add(film)
+
+        if not UserFilms.objects.filter(user=request.user, film=film).exists():
+            UserFilms.objects.create(film=film, 
+            user=request.user, 
+            order=get_max_order(request.user)
+            )
+        # create a UserFilms object to manage the relationship between user and film
         # return template with all films
-        films = request.user.films.all()
+        films = UserFilms.objects.filter(user=request.user)
         messages.success(request, f'Film {name} added')
         return render(request, 'partials/film-list.html', {'films': films})
 
@@ -67,20 +73,26 @@ def add_film(request):
 # without require_http_methods, the view will be called for all http methods, but we only want to call it for DELETE
 @require_http_methods(['DELETE'])
 def delete_film(request, pk):
-    request.user.films.remove(pk)
+    UserFilms.objects.get(pk=pk).delete()
     # return template with all films
-    films = request.user.films.all()
+    films = UserFilms.objects.filter(user=request.user)
     return render(request, 'partials/film-list.html', {'films': films})
 
 @login_required
 def search_film(request):
     search_text = request.POST.get('search')
-    userfilms = request.user.films.all()
+    userfilms = UserFilms.objects.filter(user=request.user)
     results = Film.objects.filter(name__icontains=search_text).exclude(
-        name__in=userfilms.values_list('name', flat=True)
+        name__in=userfilms.values_list('film__name', flat=True)
     )
     context = {'results': results}
     return render(request, 'partials/search-results.html', context)
 
 def clear(request):
+    return HttpResponse('')
+
+def sort(request):
+    fims_pks_order = request.POST.get('film_order')
+    print(fims_pks_order)
+    films = []
     return HttpResponse('')
