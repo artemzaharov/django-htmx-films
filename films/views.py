@@ -12,7 +12,7 @@ from films.forms import RegisterForm
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.contrib import messages
-from films.utils import get_max_order
+from films.utils import get_max_order, reorder
 
 
 
@@ -74,6 +74,7 @@ def add_film(request):
 @require_http_methods(['DELETE'])
 def delete_film(request, pk):
     UserFilms.objects.get(pk=pk).delete()
+    reorder(request.user)
     # return template with all films
     films = UserFilms.objects.filter(user=request.user)
     return render(request, 'partials/film-list.html', {'films': films})
@@ -92,7 +93,12 @@ def clear(request):
     return HttpResponse('')
 
 def sort(request):
-    fims_pks_order = request.POST.get('film_order')
+    fims_pks_order = request.POST.getlist('film_order')
     print(fims_pks_order)
     films = []
-    return HttpResponse('')
+    for idx, film_pk in enumerate(fims_pks_order, start=1):
+        userfilm = UserFilms.objects.get(pk=film_pk)
+        userfilm.order = idx
+        userfilm.save()
+        films.append(userfilm)
+    return render(request, 'partials/film-list.html', {'films': films})
