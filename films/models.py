@@ -8,7 +8,8 @@ class User(AbstractUser):
 class Film(models.Model):
     name = models.CharField(max_length=100, unique=True)
     # through is the name of the model that will be created to manage the relationship
-    users = models.ManyToManyField(User, related_name='films', through="UserFilms") # user.films.all()
+    users = models.ManyToManyField(User, related_name='films', through="UserFilms") #
+    photo = models.ImageField(upload_to='film_photos', blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -18,7 +19,7 @@ class Film(models.Model):
     
 class UserFilms(models.Model):
     '''This model is used to manage the relationship between User and Film with an extra field: order '''
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE) 
     film = models.ForeignKey(Film, on_delete=models.CASCADE)
     order = models.PositiveSmallIntegerField()
     
