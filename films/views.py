@@ -29,9 +29,9 @@ class RegisterView(FormView):
     template_name = 'registration/register.html'
     success_url = reverse_lazy('login')
 
-    def form_valid(self, form):
+    def form_valid(self, form): 
         form.save()  # save the user
-        return super().form_valid(form)
+        return super().form_valid(form) # call the parent method
     
 def check_username(request):
     username = request.POST.get('username')
@@ -41,11 +41,17 @@ def check_username(request):
         return HttpResponse('<div id="username-error" class="succes">Username available</div>')
     
 class FilmList(LoginRequiredMixin, ListView):
-    paginate_by = 10
-    model = Film
+    paginate_by = 3
+    model = UserFilms
     template_name = 'films.html'
-    context_object_name = 'films'
+    context_object_name = 'films' # name of the object in the template
     
+    def get_template_names(self):
+        # install django-htmx for this to work
+        if self.request.htmx:
+            return 'partials/film-list-elements.html'
+        return 'films.html'
+
     def get_queryset(self):
         return UserFilms.objects.filter(user=self.request.user)
 
@@ -96,7 +102,6 @@ def clear(request):
 
 def sort(request):
     fims_pks_order = request.POST.getlist('film_order')
-    print(fims_pks_order)
     films = []
     for idx, film_pk in enumerate(fims_pks_order, start=1):
         userfilm = UserFilms.objects.get(pk=film_pk)
@@ -119,7 +124,6 @@ def films_partial(request):
 @ login_required
 def upload_photo(request, pk):
     userfilm = get_object_or_404(UserFilms, pk=pk)
-    print(request.FILES)
     photo = request.FILES.get('photo')
     userfilm.film.photo.save(photo.name, photo)
     context = {'userfilm': userfilm}

@@ -15,7 +15,7 @@ class Film(models.Model):
         return self.name
     
     class Meta:
-        ordering = [Lower('name')]
+        ordering = [Lower('name')]  
     
 class UserFilms(models.Model):
     '''This model is used to manage the relationship between User and Film with an extra field: order '''

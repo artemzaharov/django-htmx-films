@@ -28,9 +28,11 @@ INSTALLED_APPS = [
     'django_extensions',
     'films',
     'debug_toolbar',
+    'django_htmx',
 ]
 
 MIDDLEWARE = [
+    "django_htmx.middleware.HtmxMiddleware",
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

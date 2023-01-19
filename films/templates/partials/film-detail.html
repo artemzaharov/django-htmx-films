@@ -4,7 +4,8 @@
         <p>This film is # {{ userfilm.order }} in {{ userfilm.user.username|title }}'s list'</p>
         <button class="btn btn-primary"
                 hx-get="{% url 'film-list-partial' %}"
-                hx-target="#film-list">Back to list</button>
+                hx-target="#film-list"
+                hx-push-url="/films/">Back to list</button>
     </div>
     <div>
         {% if userfilm.film.photo %}
@@ -20,12 +21,12 @@
             {% csrf_token %}
     </br>
             <div class="form-group">
-                <label for="photo" class="btn btn-success">
-                    Custom Upload
-                </label>
+                <label for="photo" class="btn btn-success">Choose file</label>
                 <input type="file" id="photo" name="photo" />
             </div>
             <button class="btn btn-success" type="submit">Upload File</button>
+
+    
         </form>
     </div>
 </div>
