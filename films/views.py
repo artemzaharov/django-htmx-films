@@ -41,7 +41,7 @@ def check_username(request):
         return HttpResponse('<div id="username-error" class="succes">Username available</div>')
     
 class FilmList(LoginRequiredMixin, ListView):
-    paginate_by = 3
+    paginate_by = 8
     model = UserFilms
     template_name = 'films.html'
     context_object_name = 'films' # name of the object in the template
