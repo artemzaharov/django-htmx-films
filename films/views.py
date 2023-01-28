@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from films.models import Film, UserFilms
 from django.views.generic.list import ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from films.forms import RegisterForm
+from films.forms import RegisterForm, RatingForm
 
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
@@ -18,8 +18,16 @@ from django.shortcuts import get_object_or_404
 
 
 # Create your views here.
-class IndexView(TemplateView):
+class IndexView(FormView):
     template_name = 'index.html'
+    form_class = RatingForm
+    success_url = reverse_lazy('login')
+    
+    def form_valid(self, form):
+        print(form.cleaned_data['rating'])
+        return super().form_valid(form)
+    
+    
     
 class Login(LoginView):
     template_name = 'registration/login.html'
@@ -128,3 +136,19 @@ def upload_photo(request, pk):
     userfilm.film.photo.save(photo.name, photo)
     context = {'userfilm': userfilm}
     return render(request, 'partials/film-detail.html', context)
+
+
+# def rate_view(request):
+#     if request.method == 'POST':
+#         print(request.POST)
+#         form = RatingForm(request.POST)
+#         if form.is_valid():
+#             rating = form.cleaned_data['rating']
+#             print(rating)
+#             # Do something with the rating
+#             # ...
+#             return render(request, 'registration/login.html')
+#     else:
+#         form = RatingForm()
+#     return render(request, 'index.html', {'form': form})
+ 

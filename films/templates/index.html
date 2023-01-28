@@ -1,8 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<p> Rate </p>
 
-<p>Welcome!</p>
+
+<form method="post" action="{% url 'index' %}">
+  {% csrf_token %}
+  <div class="rate">
+    {% for choice in form.rating.field.choices %}
+      <input type="radio" id="{{ choice.0 }}" name="{{ form.rating.name }}" value="{{ choice.0 }}" {% if form.rating.value == choice.0 %}checked{% endif %}>
+      <label for="{{ choice.0 }}" title="{{ choice.1 }}">{{ choice.1 }}</label>
+    {% endfor %}
+  </div>
+</br>
+</br>
+  <p>{{ form.name }}</p>
+
+   <p> {{ form.review }}</p>
+  <input type="submit" value="Submit">
+</form>
+
+
+{% comment %} <p>Welcome!</p>
 <div class="rate">
   <input type="radio" id="star5" name="rate" value="5" />
   <label for="star5" title="text">5 stars</label>
@@ -14,6 +33,6 @@
   <label for="star2" title="text">2 stars</label>
   <input type="radio" id="star1" name="rate" value="1" />
   <label for="star1" title="text">1 star</label>
-</div>
+</div> {% endcomment %}
 
 {% endblock content %}
